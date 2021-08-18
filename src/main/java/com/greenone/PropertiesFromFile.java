@@ -12,25 +12,23 @@ public class PropertiesFromFile {
 	}
 
 	public static Prop loadProp() {
-		int numberOfAccounts = 1;
-		int numberOfThread = 2;
+		int numberOfAccounts = 0;
+		int numberOfThread = 0;
 
-		try (InputStream input = LoadProperties.class.getClassLoader().getResourceAsStream("config.properties")) {
+		try (InputStream input = PropertiesFromFile.class.getClassLoader().getResourceAsStream("config.properties")) {
 
 			Properties Properties = new Properties();
 
 			Properties.load(input);
 
-			return new Prop(Integer.parseInt(Properties.getProperty("number.of.accounts")),
-					Integer.parseInt(Properties.getProperty("number.of.thread")));
-
+			numberOfAccounts = Integer.parseInt(Properties.getProperty("number.of.accounts"));
+			numberOfThread = Integer.parseInt(Properties.getProperty("number.of.thread"));//
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
 		return new Prop(numberOfAccounts, numberOfThread);
-
 	}
 }
 
@@ -47,16 +45,8 @@ class Prop {
 		return numberOfAccounts;
 	}
 
-	public void setNumberOfAccounts(int numberOfAccounts) {
-		this.numberOfAccounts = numberOfAccounts;
-	}
-
 	public int getNumberOfThread() {
 		return numberOfThread;
-	}
-
-	public void setNumberOfThread(int numberOfThread) {
-		this.numberOfThread = numberOfThread;
 	}
 }
 
