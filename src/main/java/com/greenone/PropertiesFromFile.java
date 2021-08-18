@@ -6,9 +6,8 @@ import java.util.Properties;
 
 public class PropertiesFromFile {
 	public static void main(String[] args) {
-		Prop prop = loadProp();
-
-		System.out.println(prop.getNumberOfAccounts() + ", " + prop.getNumberOfThread());
+//		Prop prop = loadProp();
+//		System.out.println(prop.getNumberOfAccounts() + ", " + prop.getNumberOfThread());
 	}
 
 	public static Prop loadProp() {
@@ -22,7 +21,7 @@ public class PropertiesFromFile {
 			Properties.load(input);
 
 			numberOfAccounts = Integer.parseInt(Properties.getProperty("number.of.accounts"));
-			numberOfThread = Integer.parseInt(Properties.getProperty("number.of.thread"));//
+			numberOfThread = Integer.parseInt(Properties.getProperty("number.of.thread"));
 
 		} catch (IOException e) {
 			e.printStackTrace();
