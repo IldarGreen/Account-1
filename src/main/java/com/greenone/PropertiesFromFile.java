@@ -6,8 +6,7 @@ import java.util.Properties;
 
 public class PropertiesFromFile {
 	public static void main(String[] args) {
-//		Prop prop = loadProp();
-//		System.out.println(prop.getNumberOfAccounts() + ", " + prop.getNumberOfThread());
+
 	}
 
 	public static Prop loadProp() {
