@@ -1,18 +1,16 @@
 package com.greenone;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static com.greenone.PropertiesFromFile.loadProp;
 
 public class Test {
+
 	public static void main(String[] args) throws InterruptedException {
 		Prop prop = loadProp();
 		List<Account> accounts = new ArrayList<>();
@@ -25,9 +23,31 @@ public class Test {
 		//Создаем пул потоков в количестве полученном из файла и раздаем им задачи(трансфер)
 		ExecutorService executorService = Executors.newFixedThreadPool(prop.getNumberOfThread());
 
-		for (int i = 0; i < 30; i++)
-			executorService.submit(new Work(i, accounts.get(random.nextInt(prop.getNumberOfAccounts())),
-					accounts.get(random.nextInt(prop.getNumberOfAccounts()))));
+		Account a1;
+		Account a2;
+		int amount;
+
+		for (int i = 0; i < 30; i++) {
+
+			while (true) {
+				a1 = accounts.get(random.nextInt(prop.getNumberOfAccounts()));
+				a2 = accounts.get(random.nextInt(prop.getNumberOfAccounts()));
+				if (a1 != a2) {
+
+					break;
+				}
+			}
+
+			amount = 5000;
+
+//			while (true) {
+//				amount = random.nextInt(10000);
+//				if ((a1.getMoney() > amount))
+//					break;
+//			}
+
+			executorService.submit(new Transaction(i, a1,a2, amount));
+		}
 
 		executorService.shutdown();
 
@@ -47,31 +67,70 @@ public class Test {
 	}
 }
 
-class Work implements Runnable {
+class Transaction implements Runnable {
 	private int id;
 	private Account acc1;
 	private Account acc2;
+	private int amount;
 
-	public Work(int id, Account acc1, Account acc2) {
+	public Transaction(int id, Account acc1, Account acc2, int amount) {
 		this.id = id;
 		this.acc1 = acc1;
 		this.acc2 = acc2;
+		this.amount = amount;
 	}
+
+	private void takeLocks (Account acc1, Account acc2) {
+		boolean acc1LockTaken = false;
+		boolean acc2LockTaken = false;
+
+		while (true) {
+			try {
+				acc1LockTaken = acc1.tryLock();
+				acc2LockTaken = acc2.tryLock();
+			} finally {
+				if (acc1LockTaken && acc2LockTaken) {
+					return;
+				}
+
+				if (acc1LockTaken) {
+					acc1.unlock();
+				}
+				if (acc2LockTaken) {
+					acc2.unlock();
+				}
+			}
+
+			try {
+				Thread.sleep(1); //Даем время потокам отдать локи
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
 
 	@Override
 	public void run() {
 		Random random = new Random();
 
+		takeLocks(acc1, acc2);
+
+		try {
+			if (acc1.getMoney() >= amount) {
+				Account.transfer(acc1, acc2, amount);
+			}
+		} finally {
+			acc1.unlock();
+			acc2.unlock();
+		}
+
 		try {
 			java.lang.Thread.sleep(1 + random.nextInt(1)); //Поток спит от 1000 до 2000мс
-
-			Account.transfer(acc1, acc2, random.nextInt(10000));
-
-			System.out.println("Transfer " + id + " completed");
-
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 
+		System.out.println("Transfer " + id + " completed");
 	}
 }

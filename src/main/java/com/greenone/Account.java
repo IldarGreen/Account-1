@@ -1,6 +1,8 @@
 package com.greenone;
 
-public class Account {
+import java.util.concurrent.locks.ReentrantLock;
+
+public class Account extends ReentrantLock {
 	private String ID;
 	private int money;
 
@@ -16,10 +18,12 @@ public class Account {
 
 	public void deposit(int amount) {
 		money += amount;
+		counter2++;
 	}
 
 	public void withdraw(int amount) {
 		money -= amount;
+		counter1++;
 	}
 
 	public int getMoney() {
@@ -42,27 +46,22 @@ public class Account {
 		return counter3;
 	}
 
-	public static void transfer(Account acc1, Account acc2, int amount) {
-
-		if ((acc1.money - amount) < 0) {
-			System.out.println("оплата не прошла-----------");
-			return;
-		}
-
-		synchronized (acc1) {
-			synchronized (acc2) {
-				acc1.withdraw(amount);
-				counter1++;
-				acc2.deposit(amount);
-				counter2++;
-			}
-		}
-
-		counter3++;
-	}
-
 	@Override
 	public String toString() {
 		return  ID + " : " + money;
+	}
+
+	public static void transfer(Account acc1, Account acc2, int amount) {
+
+		acc1.withdraw(amount);
+		System.out.println("списание " + acc1.money + " - " + amount);
+
+		acc2.deposit(amount);
+		System.out.println("депозит " + acc2.money + " - " + amount);
+
+
+//		System.out.println("оплата не прошла-----------" + acc1.money + " - " + amount);
+		counter3++;
+
 	}
 }
