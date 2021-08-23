@@ -25,28 +25,20 @@ public class Test {
 
 		Account a1;
 		Account a2;
-		int amount;
 
 		for (int i = 0; i < 30; i++) {
 
 			while (true) {
+				//Учитывая рандомный выбор аккаунтов, проверяем что не выбран один и тот же	 аккаунт
 				a1 = accounts.get(random.nextInt(prop.getNumberOfAccounts()));
 				a2 = accounts.get(random.nextInt(prop.getNumberOfAccounts()));
+
 				if (a1 != a2) {
+					executorService.submit(new Transaction(i, a1, a2));
 
 					break;
 				}
 			}
-
-			amount = 5000;
-
-//			while (true) {
-//				amount = random.nextInt(10000);
-//				if ((a1.getMoney() > amount))
-//					break;
-//			}
-
-			executorService.submit(new Transaction(i, a1,a2, amount));
 		}
 
 		executorService.shutdown();
@@ -54,33 +46,29 @@ public class Test {
 		executorService.awaitTermination(5000, TimeUnit.SECONDS);
 
 		int sum = 0;
-		for (Account account: accounts) {
+		for (Account account : accounts) {
 			System.out.println(account.getID() + " = " + account.getMoney());
 			sum += account.getMoney();
 
 		}
 
 		System.out.println("Sum = " + sum);
-		System.out.println(Account.getCounter1());
-		System.out.println(Account.getCounter2());
 		System.out.println(Account.getCounter3());
 	}
 }
 
 class Transaction implements Runnable {
-	private int id;
+	private final int id;
 	private Account acc1;
 	private Account acc2;
-	private int amount;
 
-	public Transaction(int id, Account acc1, Account acc2, int amount) {
+	public Transaction(int id, Account acc1, Account acc2) {
 		this.id = id;
 		this.acc1 = acc1;
 		this.acc2 = acc2;
-		this.amount = amount;
 	}
 
-	private void takeLocks (Account acc1, Account acc2) {
+	private void takeLocks(Account acc1, Account acc2) {
 		boolean acc1LockTaken = false;
 		boolean acc2LockTaken = false;
 
@@ -109,20 +97,32 @@ class Transaction implements Runnable {
 		}
 	}
 
-
 	@Override
 	public void run() {
 		Random random = new Random();
+		int amount;
 
-		takeLocks(acc1, acc2);
+		while (true) {
+			amount = random.nextInt(10000);
 
-		try {
-			if (acc1.getMoney() >= amount) {
-				Account.transfer(acc1, acc2, amount);
+			takeLocks(acc1, acc2);
+
+			try {
+				if (acc1.getMoney() == 0) {
+					System.out.println("Со счета нельзя произвести списание, балланс нулевой");
+					break;
+				}
+
+				if (acc1.getMoney() > amount) {
+					Account.transfer(acc1, acc2, amount);
+				} else {
+					System.out.println("Недостаточно средст для списания  " + acc1.getMoney() + "  " + amount);
+				}
+			} finally {
+				acc1.unlock();
+				acc2.unlock();
+				break;
 			}
-		} finally {
-			acc1.unlock();
-			acc2.unlock();
 		}
 
 		try {

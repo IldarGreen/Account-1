@@ -6,9 +6,7 @@ public class Account extends ReentrantLock {
 	private String ID;
 	private int money;
 
-	private static int counter1;
-	private static int counter2;
-	private static int counter3;
+		private static int counter3;
 
 
 	public Account(String ID) {
@@ -18,12 +16,10 @@ public class Account extends ReentrantLock {
 
 	public void deposit(int amount) {
 		money += amount;
-		counter2++;
 	}
 
 	public void withdraw(int amount) {
 		money -= amount;
-		counter1++;
 	}
 
 	public int getMoney() {
@@ -32,14 +28,6 @@ public class Account extends ReentrantLock {
 
 	public String getID() {
 		return ID;
-	}
-
-	public static int getCounter1() {
-		return counter1;
-	}
-
-	public static int getCounter2() {
-		return counter2;
 	}
 
 	public static int getCounter3() {
@@ -54,14 +42,8 @@ public class Account extends ReentrantLock {
 	public static void transfer(Account acc1, Account acc2, int amount) {
 
 		acc1.withdraw(amount);
-		System.out.println("списание " + acc1.money + " - " + amount);
-
 		acc2.deposit(amount);
-		System.out.println("депозит " + acc2.money + " - " + amount);
 
-
-//		System.out.println("оплата не прошла-----------" + acc1.money + " - " + amount);
 		counter3++;
-
 	}
 }
