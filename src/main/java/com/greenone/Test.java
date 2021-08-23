@@ -7,6 +7,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Logger;
+
 import static com.greenone.PropertiesFromFile.loadProp;
 
 public class Test {
@@ -61,6 +63,9 @@ class Transaction implements Runnable {
 	private final int id;
 	private Account acc1;
 	private Account acc2;
+
+	final static Logger logger = Logger.getLogger(Test.class);
+
 
 	public Transaction(int id, Account acc1, Account acc2) {
 		this.id = id;
@@ -132,5 +137,9 @@ class Transaction implements Runnable {
 		}
 
 		System.out.println("Transfer " + id + " completed");
+
+		if (logger.isInfoEnabled()) {
+			logger.info("Transfer " + id + " completed");
+		}
 	}
 }
