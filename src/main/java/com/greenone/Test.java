@@ -114,14 +114,16 @@ class Transaction implements Runnable {
 
 			try {
 				if (acc1.getMoney() == 0) {
-					System.out.println("Со счета нельзя произвести списание, балланс нулевой");
+					logger.info("Can't make withdraw from " + acc1.getID() + ", the balance is zero");
 					break;
 				}
 
 				if (acc1.getMoney() > amount) {
 					Account.transfer(acc1, acc2, amount);
+					logger.info("Transfer " + id + " from " + acc1.getID() + " to " + acc2.getID() + " completed");
 				} else {
-					System.out.println("Недостаточно средст для списания  " + acc1.getMoney() + "  " + amount);
+					logger.info("Transfer from " + acc1.getID() + " to " + acc2.getID() +
+								" not completed. Reason: not enough balance to withdraw");
 				}
 			} finally {
 				acc1.unlock();
@@ -134,12 +136,6 @@ class Transaction implements Runnable {
 			java.lang.Thread.sleep(1 + random.nextInt(1)); //Поток спит от 1000 до 2000мс
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		}
-
-		System.out.println("Transfer " + id + " completed");
-
-		if (logger.isInfoEnabled()) {
-			logger.info("Transfer " + id + " completed");
 		}
 	}
 }
