@@ -57,7 +57,7 @@ public class Test {
 		}
 
 		System.out.println("Sum = " + sum);
-		System.out.println(Account.getCounter3());
+		System.out.println("Number of successful transaction: " + Account.getCounter3());
 	}
 }
 
