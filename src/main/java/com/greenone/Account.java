@@ -1,12 +1,10 @@
 package com.greenone;
 
-import java.util.concurrent.locks.ReentrantLock;
-
-public class Account extends ReentrantLock {
+public class Account {
 	private String ID;
 	private int money;
 
-		private static int counter3;
+	private static int counter3;
 
 
 	public Account(String ID) {

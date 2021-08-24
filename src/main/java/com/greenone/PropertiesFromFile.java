@@ -1,17 +1,17 @@
 package com.greenone;
 
-import java.io.IOException;
+import org.apache.log4j.Logger;
+
 import java.io.InputStream;
 import java.util.Properties;
 
 public class PropertiesFromFile {
-	public static void main(String[] args) {
 
-	}
+	final static Logger logger = Logger.getLogger(PropertiesFromFile.class);
 
 	public static Prop loadProp() {
-		int numberOfAccounts = 0;
-		int numberOfThread = 0;
+		int numberOfAccounts = 4;
+		int numberOfThread = 2;
 
 		try (InputStream input = PropertiesFromFile.class.getClassLoader().getResourceAsStream("config.properties")) {
 
@@ -22,8 +22,8 @@ public class PropertiesFromFile {
 			numberOfAccounts = Integer.parseInt(Properties.getProperty("number.of.accounts"));
 			numberOfThread = Integer.parseInt(Properties.getProperty("number.of.thread"));
 
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			logger.error("Can't fined config.properties file or load variable values.", e);
 		}
 
 		return new Prop(numberOfAccounts, numberOfThread);
