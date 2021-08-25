@@ -2,6 +2,7 @@ package com.greenone;
 
 import org.apache.log4j.Logger;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -10,10 +11,12 @@ public class PropertiesFromFile {
 	final static Logger logger = Logger.getLogger(PropertiesFromFile.class);
 
 	public static Prop loadProp() {
+		//Значения по умолчанию, если не получится загрузить из файла
 		int numberOfAccounts = 4;
 		int numberOfThread = 2;
 
-		try (InputStream input = PropertiesFromFile.class.getClassLoader().getResourceAsStream("config.properties")) {
+		try (InputStream input = PropertiesFromFile.class.getClassLoader()
+				.getResourceAsStream("config.properties")) {
 
 			Properties Properties = new Properties();
 

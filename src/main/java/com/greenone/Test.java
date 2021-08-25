@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 
 import static com.greenone.PropertiesFromFile.loadProp;
+import static com.greenone.PropertiesFromFile.logger;
 
 public class Test {
 
@@ -19,25 +20,23 @@ public class Test {
 		List<Account> accounts = new ArrayList<>();
 		Random random = new Random();
 
-
 		//Создаем аккаунты в количестве полученном из файла
 		for (int i = 0; i < prop.getNumberOfAccounts(); i++)
 			accounts.add(new Account(Integer.toString(i)));
 
 		//Создаем пул потоков в количестве полученном из файла и раздаем им задачи(трансфер)
-
 		ExecutorService executorService = Executors.newFixedThreadPool(prop.getNumberOfThread());
 
 		Account a1;
 		Account a2;
 
+		//Раздаем задачи для executorService
 		for (int i = 0; i < 30; i++) {
-
 			while (true) {
-				//Учитывая рандомный выбор аккаунтов, проверяем что не выбран один и тот же	 аккаунт
 				a1 = accounts.get(random.nextInt(prop.getNumberOfAccounts()));
 				a2 = accounts.get(random.nextInt(prop.getNumberOfAccounts()));
 
+				//Учитывая рандомный выбор аккаунтов, проверяем что не выбран один и тот же	аккаунт
 				if (a1 != a2) {
 					executorService.submit(new Transaction(i, a1, a2));
 					break;
@@ -47,17 +46,18 @@ public class Test {
 
 		executorService.shutdown();
 
-		executorService.awaitTermination(5000, TimeUnit.SECONDS);
+		executorService.awaitTermination(10000, TimeUnit.SECONDS);
+
+		//Выводим общую информацию после всех транзакций
+		logger.info("Number of successful transaction: " + Account.getCounter1());
 
 		int sum = 0;
 		for (Account account : accounts) {
-			System.out.println(account.getID() + " = " + account.getMoney());
+			logger.info(account.getID() + " = " + account.getMoney());
 			sum += account.getMoney();
-
 		}
 
-		System.out.println("Sum = " + sum);
-		System.out.println("Number of successful transaction: " + Account.getCounter3());
+		logger.info("Sum for all accounts  = " + sum);
 	}
 }
 
@@ -87,7 +87,6 @@ class Transaction implements Runnable {
 					logger.info("Can't make withdraw from " + acc1.getID() + ", the balance is zero");
 					break;
 				}
-
 				if (acc1.getMoney() > amount) {
 					Account.transfer(acc1, acc2, amount);
 					logger.info("Transfer " + id + " from " + acc1.getID() + " to " + acc2.getID()
@@ -103,7 +102,7 @@ class Transaction implements Runnable {
 		}
 
 		try {
-			java.lang.Thread.sleep(1 + random.nextInt(1)); //Поток спит от 1000 до 2000мс
+			java.lang.Thread.sleep(1000 + random.nextInt(1000)); //Поток спит от 1000 до 2000мс
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 			logger.error("Something go wrong: ", e);

@@ -4,7 +4,7 @@ public class Account {
 	private String ID;
 	private int money;
 
-	private static int counter3;
+	private static int counter1;
 
 
 	public Account(String ID) {
@@ -28,8 +28,8 @@ public class Account {
 		return ID;
 	}
 
-	public static int getCounter3() {
-		return counter3;
+	public static int getCounter1() {
+		return counter1;
 	}
 
 	@Override
@@ -42,6 +42,6 @@ public class Account {
 		acc1.withdraw(amount);
 		acc2.deposit(amount);
 
-		counter3++;
+		counter1++;
 	}
 }
